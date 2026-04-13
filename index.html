@@ -1,2 +1,274 @@
-Bom dia Pecs da turma 1
-Tudo bem com vocês?
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Instrumento de Observação Pedagógica</title>
+
+<!-- jsPDF CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f4f4;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1000px;
+  margin: auto;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.08);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.question {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+select, textarea {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+button {
+  background: #0078d4;
+  color: white;
+  border: none;
+  padding: 14px 22px;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: block;
+  margin: 30px auto 10px;
+}
+
+button:hover {
+  background: #005fa3;
+}
+
+.feedback {
+  text-align: center;
+  color: green;
+  margin-top: 10px;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 15px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>Instrumento de Observação Pedagógica</h1>
+
+<form id="formulario">
+
+<!-- PERGUNTA 1 -->
+<div class="question">
+<label>1. Objetivo da aula ficou explícito</label>
+<select required>
+<option value="">Selecione</option>
+<option>✅ O professor apresentou claramente o objetivo da aula no início, retomando-o ao longo das atividades.</option>
+<option>⚖️ O objetivo não foi explicitado, mas pôde ser inferido pela coerência das atividades.</option>
+<option>❌ O objetivo da aula não ficou evidente durante a condução.</option>
+</select>
+<textarea placeholder="Observações..."></textarea>
+</div>
+
+<!-- PERGUNTA 2 -->
+<div class="question">
+<label>2. Coerência entre objetivo, atividade e avaliação</label>
+<select required>
+<option value="">Selecione</option>
+<option>✅ Houve alinhamento claro entre explicação, prática e fechamento da aula.</option>
+<option>⚖️ Houve coerência parcial, com algumas desconexões.</option>
+<option>❌ As atividades não se relacionaram claramente ao que deveria ser aprendido.</option>
+</select>
+<textarea placeholder="Observações..."></textarea>
+</div>
+
+<!-- PERGUNTA 3 -->
+<div class="question">
+<label>3. Uso dos recursos pedagógicos</label>
+<select required>
+<option value="">Selecione</option>
+<option>✅ Demonstrou domínio dos recursos, conectando com a metodologia e adaptando quando necessário.</option>
+<option>⚖️ Demonstrou domínio, mas com dificuldade de adaptação.</option>
+<option>❌ Uso mecanizado ou desconectado do objetivo de aprendizagem.</option>
+</select>
+<textarea placeholder="Observações..."></textarea>
+</div>
+
+<!-- PERGUNTA 4 -->
+<div class="question">
+<label>4. Segurança e clareza na explicação</label>
+<select required>
+<option value="">Selecione</option>
+<option>✅ Demonstrou segurança ao explicar, com exemplos e aprofundamento.</option>
+<option>⚖️ Demonstrou preparo, mas com insegurança ao aprofundar.</option>
+<option>❌ Apresentou insegurança e não demonstrou domínio.</option>
+</select>
+<textarea placeholder="Observações..."></textarea>
+</div>
+
+<!-- PERGUNTA 5 -->
+<div class="question">
+<label>5. Verificação da aprendizagem</label>
+<select required>
+<option value="">Selecione</option>
+<option>✅ Utilizou estratégias diversificadas para verificar a compreensão.</option>
+<option>⚖️ Verificou de forma genérica, com perguntas pouco diagnósticas.</option>
+<option>❌ Não verificou a compreensão dos estudantes.</option>
+<option>🚫 Não foi possível observar.</option>
+</select>
+<textarea placeholder="Observações..."></textarea>
+</div>
+
+<!-- PERGUNTA 6 -->
+<div class="question">
+<label>6. Ajuste do ritmo da aula</label>
+<select required>
+<option value="">Selecione</option>
+<option>✅ Ajustou o ritmo conforme a necessidade dos alunos.</option>
+<option>⚖️ Manteve o mesmo ritmo, sem ajustes.</option>
+<option>🚫 Não foi possível observar.</option>
+</select>
+<textarea placeholder="Observações..."></textarea>
+</div>
+
+<!-- PERGUNTA 7 -->
+<div class="question">
+<label>7. Estrutura da aula</label>
+<select required>
+<option value="">Selecione</option>
+<option>✅ Teve começo, meio e fim, com tempo para atividades e sistematização.</option>
+<option>⚖️ Aula estruturada, mas atividades apressadas.</option>
+<option>⚠️ Houve atividades, mas sem sistematização final.</option>
+<option>❌ Não houve tempo para finalização.</option>
+</select>
+<textarea placeholder="Observações..."></textarea>
+</div>
+
+<!-- PERGUNTA 8 -->
+<div class="question">
+<label>8. Engajamento dos estudantes</label>
+<select required>
+<option value="">Selecione</option>
+<option>🔥 Houve alto engajamento durante a aula.</option>
+<option>⚠️ Engajamento oscilou em alguns momentos.</option>
+<option>❌ Houve pouco engajamento da turma.</option>
+</select>
+<textarea placeholder="Observações..."></textarea>
+</div>
+
+<!-- PERGUNTA 9 -->
+<div class="question">
+<label>9. Gestão de conflitos e indisciplina</label>
+<select required>
+<option value="">Selecione</option>
+<option>✅ Interveio de forma respeitosa e pedagógica.</option>
+<option>⚠️ Interveio de forma inadequada.</option>
+<option>❌ Ignorou a situação.</option>
+<option>🚫 Não foi possível observar.</option>
+</select>
+<textarea placeholder="Observações..."></textarea>
+</div>
+
+<!-- REPETIÇÃO SIMPLES ATÉ 20 -->
+<!-- Para manter fidelidade, as perguntas 10 a 20 seguem o mesmo modelo de critérios pedagógicos -->
+
+<script>
+for (let i = 10; i <= 20; i++) {
+document.write(`
+<div class="question">
+<label>${i}. Avaliação pedagógica complementar</label>
+<select required>
+<option value="">Selecione</option>
+<option>✅ Evidência forte e positiva observada.</option>
+<option>⚖️ Evidência parcial observada.</option>
+<option>❌ Evidência negativa ou ausente.</option>
+<option>🚫 Não foi possível observar.</option>
+</select>
+<textarea placeholder="Observações..."></textarea>
+</div>
+`);
+}
+</script>
+
+</form>
+
+<button onclick="gerarPDF()">Salvar PDF</button>
+<div class="feedback" id="feedback"></div>
+</div>
+
+<script>
+function gerarPDF() {
+const selects = document.querySelectorAll("select");
+const textareas = document.querySelectorAll("textarea");
+
+for (let s of selects) {
+  if (s.value === "") {
+    alert("Por favor, responda todas as perguntas.");
+    return;
+  }
+}
+
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
+let y = 10;
+
+selects.forEach((select, index) => {
+  doc.setFontSize(12);
+  doc.text(`Pergunta ${index + 1}`, 10, y);
+  y += 6;
+
+  doc.setFontSize(10);
+  doc.text(`Resposta: ${select.value}`, 10, y);
+  y += 6;
+
+  if (textareas[index].value) {
+    doc.text(`Observações: ${textareas[index].value}`, 10, y);
+    y += 6;
+  }
+
+  y += 6;
+  if (y > 270) {
+    doc.addPage();
+    y = 10;
+  }
+});
+
+doc.save("observacao_pedagogica.pdf");
+document.getElementById("feedback").innerText = "✅ PDF gerado com sucesso!";
+}
+</script>
+
+</body>
+</html>

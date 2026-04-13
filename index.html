@@ -4,9 +4,8 @@
 <meta charset="UTF-8">
 <title>Instrumento de Observação Pedagógica</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<style>
+<!-- jsPDF CDN (CORRIGIDO) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.jstyle>
 body {
   font-family: Arial, sans-serif;
   background: #f4f4f4;
@@ -47,10 +46,7 @@ select, textarea {
 
 textarea {
   min-height: 60px;
-}
-
-.subrespostas {
-  margin-top: 10px;
+  resize: vertical;
 }
 
 .subrespostas label {
@@ -60,7 +56,7 @@ textarea {
 
 button {
   background: #0078d4;
-  color: white;
+  color: #fff;
   border: none;
   padding: 14px 22px;
   font-size: 16px;
@@ -94,10 +90,9 @@ button:hover {
 </div>
 
 <script>
-// ==========================
-// CONFIGURAÇÕES EDITÁVEIS
-// ==========================
-
+// ============================
+// PERGUNTAS
+// ============================
 const perguntas = [
   "Objetivo da aula",
   "Coerência pedagógica",
@@ -121,6 +116,9 @@ const perguntas = [
   "Feedback pedagógico"
 ];
 
+// ============================
+// RESPOSTAS PRINCIPAIS
+// ============================
 const respostasPrincipais = [
   "✅ Evidência positiva observada",
   "⚖️ Evidência parcialmente observada",
@@ -128,43 +126,46 @@ const respostasPrincipais = [
   "🚫 Não foi possível observar"
 ];
 
-// ✅ EDITE AS SUB-RESPOSTAS AQUI
-const subRespostasPadrao = [
-  "Sub-resposta 1",
-  "Sub-resposta 2",
-  "Sub-resposta 3",
-  "Sub-resposta 4",
-  "Sub-resposta 5",
-  "Sub-resposta 6",
-  "Sub-resposta 7",
-  "Sub-resposta 8",
-  "Sub-resposta 9",
-  "Sub-resposta 10",
-  "Sub-resposta 11",
-  "Sub-resposta 12",
-  "Sub-resposta 13",
-  "Sub-resposta 14",
-  "Sub-resposta 15",
-  "Sub-resposta 16",
-  "Sub-resposta 17",
-  "Sub-resposta 18",
-  "Sub-resposta 19",
-  "Sub-resposta 20"
-];
+// ============================
+// SUB-RESPOSTAS POR PERGUNTA
+// ============================
+const subRespostasPorPergunta = {
+  0: ["Objetivo claro", "Objetivo retomado", "Objetivo contextualizado", "Objetivo escrito", "Objetivo verbalizado"],
+  1: ["Atividades alinhadas", "Avaliação coerente", "Sequência lógica", "Planejamento evidente", "Fluxo consistente"],
+  2: ["Propósito explicado", "Finalidade compreendida", "Contextualização inicial", "Expectativas claras", "Sentido da atividade"],
+  3: ["Uso de slides", "Uso do quadro", "Material impresso", "Tecnologia educacional", "Recursos variados"],
+  4: ["Adaptação ao ritmo", "Mudança de estratégia", "Flexibilidade", "Ajustes pedagógicos", "Sensibilidade à turma"],
+  5: ["Recurso alinhado ao conteúdo", "Tecnologia com sentido", "Uso pedagógico", "Mediação ativa", "Recurso como meio"],
+  6: ["Explicação clara", "Exemplos eficazes", "Linguagem acessível", "Confiança conceitual", "Domínio do tema"],
+  7: ["Aprofundamento adequado", "Exploração conceitual", "Ampliação do conteúdo", "Resposta às dúvidas", "Conexões teóricas"],
+  8: ["Segurança conceitual", "Domínio curricular", "Ausência de erros", "Conexões com outros conteúdos", "Fluidez"],
+  9: ["Perguntas diagnósticas", "Acompanhamento individual", "Registros escritos", "Discussão coletiva", "Correção dialogada"],
+  10:["Perguntas abertas", "Perguntas reflexivas", "Justificativas solicitadas", "Exploração das respostas", "Mediação das falas"],
+  11:["Nenhuma checagem", "Ausência de perguntas", "Sem acompanhamento", "Sem devolutivas", "Postura expositiva"],
+  12:["Ritmo adequado", "Pausas para dúvidas", "Tempo ajustado", "Flexibilidade temporal", "Atenção à turma"],
+  13:["Mudança de estratégia", "Reexplicação", "Nova abordagem", "Ajuste didático", "Escuta ativa"],
+  14:["Início estruturado", "Desenvolvimento organizado", "Fechamento claro", "Encadeamento lógico", "Síntese final"],
+  15:["Tempo bem distribuído", "Atividades concluídas", "Correção realizada", "Planejamento executado", "Gestão eficaz"],
+  16:["Participação ativa", "Interação entre alunos", "Discussões produtivas", "Interesse visível", "Motivação"],
+  17:["Dispersão", "Tarefas pouco significativas", "Explicação longa", "Pouca interação", "Baixo desafio"],
+  18:["Diálogo respeitoso", "Mediação adequada", "Postura acolhedora", "Controle emocional", "Orientação clara"],
+  19:["Feedback construtivo", "Orientações claras", "Valorização dos alunos", "Devolutiva pedagógica", "Reconhecimento"]
+};
 
-// ==========================
-// CRIAÇÃO DO FORMULÁRIO
-// ==========================
-
+// ============================
+// CONSTRUIR FORMULÁRIO
+// ============================
 const form = document.getElementById("formulario");
 
 perguntas.forEach((pergunta, index) => {
   const div = document.createElement("div");
   div.className = "question";
 
-  let subHtml = "";
-  subRespostasPadrao.forEach((sub, i) => {
-    subHtml += `
+  const subs = subRespostasPorPergunta[index] || [];
+  let subsHtml = "";
+
+  subs.forEach(sub => {
+    subsHtml += `
       <label>
         <input type="checkbox" name="sub_${index}" value="${sub}" disabled>
         ${sub}
@@ -175,40 +176,39 @@ perguntas.forEach((pergunta, index) => {
     <label>${index + 1}. ${pergunta}</label>
 
     <label>Resposta principal</label>
-    <select required onchange="ativarSubrespostas(${index})">
+    <select onchange="ativarSub(${index})">
       <option value="">Selecione</option>
       ${respostasPrincipais.map(r => `<option>${r}</option>`).join("")}
     </select>
 
     <div class="subrespostas">
-      <label>Sub-respostas (pode marcar mais de uma)</label>
-      ${subHtml}
+      <label>Sub-respostas (marque quantas quiser)</label>
+      ${subsHtml}
     </div>
 
     <label>Observações</label>
-    <textarea placeholder="Observações..."></textarea>
+    <textarea></textarea>
   `;
 
   form.appendChild(div);
 });
 
-// ==========================
-// FUNÇÕES
-// ==========================
-
-function ativarSubrespostas(index) {
+function ativarSub(index) {
   document.querySelectorAll(`input[name="sub_${index}"]`)
     .forEach(cb => cb.disabled = false);
 }
 
+// ============================
+// GERAR PDF
+// ============================
 function gerarPDF() {
   const selects = document.querySelectorAll("select");
   const textareas = document.querySelectorAll("textarea");
 
   for (let i = 0; i < selects.length; i++) {
-    const subChecks = document.querySelectorAll(`input[name="sub_${i}"]:checked`);
-    if (!selects[i].value || subChecks.length === 0) {
-      alert("Responda todas as perguntas e selecione ao menos uma sub-resposta.");
+    const subs = document.querySelectorAll(`input[name="sub_${i}"]:checked`);
+    if (!selects[i].value || subs.length === 0) {
+      alert("Preencha todas as respostas e selecione ao menos uma sub-resposta.");
       return;
     }
   }
@@ -225,8 +225,7 @@ function gerarPDF() {
     doc.text(`Resposta: ${selects[i].value}`, 10, y); y += 6;
 
     const subs = [...document.querySelectorAll(`input[name="sub_${i}"]:checked`)]
-      .map(cb => cb.value)
-      .join(", ");
+      .map(cb => cb.value).join(", ");
 
     doc.text(`Sub-respostas: ${subs}`, 10, y); y += 6;
 
@@ -235,4 +234,13 @@ function gerarPDF() {
     }
 
     y += 6;
-    if (y > 270) {
+    if (y > 270) { doc.addPage(); y = 10; }
+  });
+
+  doc.save("observacao_pedagogica.pdf");
+  document.getElementById("feedback").textContent = "✅ PDF gerado com sucesso!";
+}
+</script>
+
+</body>
+</html>

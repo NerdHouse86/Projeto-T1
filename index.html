@@ -4,8 +4,10 @@
 <meta charset="UTF-8">
 <title>Instrumento de Observação Pedagógica</title>
 
-<!-- jsPDF CDN (CORRIGIDO) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.jstyle>
+<!-- jsPDF CDN CORRETO -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
 body {
   font-family: Arial, sans-serif;
   background: #f4f4f4;
@@ -23,7 +25,6 @@ body {
 
 h1 {
   text-align: center;
-  margin-bottom: 30px;
 }
 
 .question {
@@ -38,20 +39,13 @@ label {
   margin-top: 10px;
 }
 
+.subrespostas label {
+  font-weight: normal;
+}
+
 select, textarea {
   width: 100%;
   padding: 8px;
-  margin-top: 5px;
-}
-
-textarea {
-  min-height: 60px;
-  resize: vertical;
-}
-
-.subrespostas label {
-  font-weight: normal;
-  display: block;
 }
 
 button {
@@ -59,7 +53,6 @@ button {
   color: #fff;
   border: none;
   padding: 14px 22px;
-  font-size: 16px;
   border-radius: 6px;
   cursor: pointer;
   display: block;
@@ -91,99 +84,50 @@ button:hover {
 
 <script>
 // ============================
-// PERGUNTAS
+// DADOS
 // ============================
 const perguntas = [
-  "Objetivo da aula",
-  "Coerência pedagógica",
-  "Clareza do propósito",
-  "Uso de recursos didáticos",
-  "Adaptação dos recursos",
-  "Conexão recurso–objetivo",
-  "Segurança na explicação",
-  "Aprofundamento conceitual",
-  "Domínio do conteúdo",
-  "Verificação da aprendizagem",
-  "Qualidade das perguntas",
-  "Ausência de verificação",
-  "Ritmo da aula",
-  "Flexibilidade pedagógica",
-  "Estrutura didática",
-  "Gestão do tempo",
-  "Engajamento dos alunos",
-  "Momentos de desengajamento",
-  "Gestão de conflitos",
+  "Objetivo da aula", "Coerência pedagógica", "Clareza do propósito",
+  "Uso de recursos didáticos", "Adaptação dos recursos",
+  "Conexão recurso–objetivo", "Segurança na explicação",
+  "Aprofundamento conceitual", "Domínio do conteúdo",
+  "Verificação da aprendizagem", "Qualidade das perguntas",
+  "Ausência de verificação", "Ritmo da aula",
+  "Flexibilidade pedagógica", "Estrutura didática",
+  "Gestão do tempo", "Engajamento dos alunos",
+  "Momentos de desengajamento", "Gestão de conflitos",
   "Feedback pedagógico"
 ];
 
-// ============================
-// RESPOSTAS PRINCIPAIS
-// ============================
 const respostasPrincipais = [
   "✅ Evidência positiva observada",
-  "⚖️ Evidência parcialmente observada",
-  "❌ Evidência não observada",
+  "⚖️ Parcialmente observada",
+  "❌ Não observada",
   "🚫 Não foi possível observar"
 ];
 
 // ============================
-// SUB-RESPOSTAS POR PERGUNTA
-// ============================
-const subRespostasPorPergunta = {
-  0: ["Objetivo claro", "Objetivo retomado", "Objetivo contextualizado", "Objetivo escrito", "Objetivo verbalizado"],
-  1: ["Atividades alinhadas", "Avaliação coerente", "Sequência lógica", "Planejamento evidente", "Fluxo consistente"],
-  2: ["Propósito explicado", "Finalidade compreendida", "Contextualização inicial", "Expectativas claras", "Sentido da atividade"],
-  3: ["Uso de slides", "Uso do quadro", "Material impresso", "Tecnologia educacional", "Recursos variados"],
-  4: ["Adaptação ao ritmo", "Mudança de estratégia", "Flexibilidade", "Ajustes pedagógicos", "Sensibilidade à turma"],
-  5: ["Recurso alinhado ao conteúdo", "Tecnologia com sentido", "Uso pedagógico", "Mediação ativa", "Recurso como meio"],
-  6: ["Explicação clara", "Exemplos eficazes", "Linguagem acessível", "Confiança conceitual", "Domínio do tema"],
-  7: ["Aprofundamento adequado", "Exploração conceitual", "Ampliação do conteúdo", "Resposta às dúvidas", "Conexões teóricas"],
-  8: ["Segurança conceitual", "Domínio curricular", "Ausência de erros", "Conexões com outros conteúdos", "Fluidez"],
-  9: ["Perguntas diagnósticas", "Acompanhamento individual", "Registros escritos", "Discussão coletiva", "Correção dialogada"],
-  10:["Perguntas abertas", "Perguntas reflexivas", "Justificativas solicitadas", "Exploração das respostas", "Mediação das falas"],
-  11:["Nenhuma checagem", "Ausência de perguntas", "Sem acompanhamento", "Sem devolutivas", "Postura expositiva"],
-  12:["Ritmo adequado", "Pausas para dúvidas", "Tempo ajustado", "Flexibilidade temporal", "Atenção à turma"],
-  13:["Mudança de estratégia", "Reexplicação", "Nova abordagem", "Ajuste didático", "Escuta ativa"],
-  14:["Início estruturado", "Desenvolvimento organizado", "Fechamento claro", "Encadeamento lógico", "Síntese final"],
-  15:["Tempo bem distribuído", "Atividades concluídas", "Correção realizada", "Planejamento executado", "Gestão eficaz"],
-  16:["Participação ativa", "Interação entre alunos", "Discussões produtivas", "Interesse visível", "Motivação"],
-  17:["Dispersão", "Tarefas pouco significativas", "Explicação longa", "Pouca interação", "Baixo desafio"],
-  18:["Diálogo respeitoso", "Mediação adequada", "Postura acolhedora", "Controle emocional", "Orientação clara"],
-  19:["Feedback construtivo", "Orientações claras", "Valorização dos alunos", "Devolutiva pedagógica", "Reconhecimento"]
-};
-
-// ============================
-// CONSTRUIR FORMULÁRIO
+// FORMULÁRIO
 // ============================
 const form = document.getElementById("formulario");
 
-perguntas.forEach((pergunta, index) => {
+perguntas.forEach((pergunta, i) => {
   const div = document.createElement("div");
   div.className = "question";
 
-  const subs = subRespostasPorPergunta[index] || [];
-  let subsHtml = "";
-
-  subs.forEach(sub => {
-    subsHtml += `
-      <label>
-        <input type="checkbox" name="sub_${index}" value="${sub}" disabled>
-        ${sub}
-      </label>`;
-  });
-
   div.innerHTML = `
-    <label>${index + 1}. ${pergunta}</label>
+    <label>${i + 1}. ${pergunta}</label>
 
-    <label>Resposta principal</label>
-    <select onchange="ativarSub(${index})">
+    <select onchange="ativarSub(${i})">
       <option value="">Selecione</option>
       ${respostasPrincipais.map(r => `<option>${r}</option>`).join("")}
     </select>
 
     <div class="subrespostas">
-      <label>Sub-respostas (marque quantas quiser)</label>
-      ${subsHtml}
+      ${["Item 1","Item 2","Item 3"].map(sub => `
+        <label>
+          <input type="checkbox" name="sub_${i}" disabled> ${sub}
+        </label>`).join("")}
     </div>
 
     <label>Observações</label>
@@ -193,52 +137,64 @@ perguntas.forEach((pergunta, index) => {
   form.appendChild(div);
 });
 
-function ativarSub(index) {
-  document.querySelectorAll(`input[name="sub_${index}"]`)
+function ativarSub(i) {
+  document.querySelectorAll(`input[name="sub_${i}"]`)
     .forEach(cb => cb.disabled = false);
 }
 
 // ============================
-// GERAR PDF
+// PDF
 // ============================
 function gerarPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
   const selects = document.querySelectorAll("select");
   const textareas = document.querySelectorAll("textarea");
 
-  for (let i = 0; i < selects.length; i++) {
-    const subs = document.querySelectorAll(`input[name="sub_${i}"]:checked`);
-    if (!selects[i].value || subs.length === 0) {
-      alert("Preencha todas as respostas e selecione ao menos uma sub-resposta.");
+  let y = 10;
+
+  for (let i = 0; i < perguntas.length; i++) {
+    const subs = [...document.querySelectorAll(`input[name="sub_${i}"]:checked`)];
+
+    if (!selects[i].value) {
+      alert(`Responda a pergunta ${i + 1}`);
       return;
+    }
+
+    doc.setFontSize(12);
+    const texto = doc.splitTextToSize(`${i+1}. ${perguntas[i]}`, 180);
+    doc.text(texto, 10, y);
+    y += texto.length * 6;
+
+    doc.setFontSize(10);
+
+    doc.text(`Resposta: ${selects[i].value}`, 10, y);
+    y += 6;
+
+    if (subs.length > 0) {
+      const listaSubs = subs.map(cb => cb.parentElement.textContent.trim()).join(", ");
+      const textoSubs = doc.splitTextToSize(`Sub: ${listaSubs}`, 180);
+      doc.text(textoSubs, 10, y);
+      y += textoSubs.length * 6;
+    }
+
+    if (textareas[i].value) {
+      const obs = doc.splitTextToSize(`Obs: ${textareas[i].value}`, 180);
+      doc.text(obs, 10, y);
+      y += obs.length * 6;
+    }
+
+    y += 8;
+
+    if (y > 270) {
+      doc.addPage();
+      y = 10;
     }
   }
 
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  let y = 10;
-
-  perguntas.forEach((p, i) => {
-    doc.setFontSize(12);
-    doc.text(`${i + 1}. ${p}`, 10, y); y += 6;
-
-    doc.setFontSize(10);
-    doc.text(`Resposta: ${selects[i].value}`, 10, y); y += 6;
-
-    const subs = [...document.querySelectorAll(`input[name="sub_${i}"]:checked`)]
-      .map(cb => cb.value).join(", ");
-
-    doc.text(`Sub-respostas: ${subs}`, 10, y); y += 6;
-
-    if (textareas[i].value) {
-      doc.text(`Observações: ${textareas[i].value}`, 10, y); y += 6;
-    }
-
-    y += 6;
-    if (y > 270) { doc.addPage(); y = 10; }
-  });
-
-  doc.save("observacao_pedagogica.pdf");
-  document.getElementById("feedback").textContent = "✅ PDF gerado com sucesso!";
+  doc.save("observacao.pdf");
+  document.getElementById("feedback").textContent = "PDF gerado com sucesso!";
 }
 </script>
 

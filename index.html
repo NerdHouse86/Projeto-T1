@@ -15,8 +15,8 @@ body {
 
 .container {
   max-width: 1000px;
-  background: #fff;
   margin: auto;
+  background: #fff;
   padding: 30px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
@@ -35,8 +35,8 @@ h1 {
 
 label {
   font-weight: bold;
-  margin-top: 10px;
   display: block;
+  margin-top: 10px;
 }
 
 select, textarea {
@@ -47,7 +47,15 @@ select, textarea {
 
 textarea {
   min-height: 60px;
-  resize: vertical;
+}
+
+.subrespostas {
+  margin-top: 10px;
+}
+
+.subrespostas label {
+  font-weight: normal;
+  display: block;
 }
 
 button {
@@ -58,8 +66,8 @@ button {
   font-size: 16px;
   border-radius: 6px;
   cursor: pointer;
-  margin: 20px auto;
   display: block;
+  margin: 30px auto;
 }
 
 button:hover {
@@ -86,6 +94,10 @@ button:hover {
 </div>
 
 <script>
+// ==========================
+// CONFIGURAÇÕES EDITÁVEIS
+// ==========================
+
 const perguntas = [
   "Objetivo da aula",
   "Coerência pedagógica",
@@ -116,31 +128,62 @@ const respostasPrincipais = [
   "🚫 Não foi possível observar"
 ];
 
+// ✅ EDITE AS SUB-RESPOSTAS AQUI
+const subRespostasPadrao = [
+  "Sub-resposta 1",
+  "Sub-resposta 2",
+  "Sub-resposta 3",
+  "Sub-resposta 4",
+  "Sub-resposta 5",
+  "Sub-resposta 6",
+  "Sub-resposta 7",
+  "Sub-resposta 8",
+  "Sub-resposta 9",
+  "Sub-resposta 10",
+  "Sub-resposta 11",
+  "Sub-resposta 12",
+  "Sub-resposta 13",
+  "Sub-resposta 14",
+  "Sub-resposta 15",
+  "Sub-resposta 16",
+  "Sub-resposta 17",
+  "Sub-resposta 18",
+  "Sub-resposta 19",
+  "Sub-resposta 20"
+];
+
+// ==========================
+// CRIAÇÃO DO FORMULÁRIO
+// ==========================
+
 const form = document.getElementById("formulario");
 
-perguntas.forEach((textoPergunta, index) => {
+perguntas.forEach((pergunta, index) => {
   const div = document.createElement("div");
   div.className = "question";
 
-  let subOptions = "";
-  for (let i = 1; i <= 20; i++) {
-    subOptions += `<option>Sub-resposta ${i}</option>`;
-  }
+  let subHtml = "";
+  subRespostasPadrao.forEach((sub, i) => {
+    subHtml += `
+      <label>
+        <input type="checkbox" name="sub_${index}" value="${sub}" disabled>
+        ${sub}
+      </label>`;
+  });
 
   div.innerHTML = `
-    <label>${index + 1}. ${textoPergunta}</label>
+    <label>${index + 1}. ${pergunta}</label>
 
     <label>Resposta principal</label>
-    <select class="resposta" required onchange="habilitarSubResposta(${index})">
+    <select required onchange="ativarSubrespostas(${index})">
       <option value="">Selecione</option>
       ${respostasPrincipais.map(r => `<option>${r}</option>`).join("")}
     </select>
 
-    <label>Sub-resposta</label>
-    <select class="subresposta" required disabled>
-      <option value="">Selecione uma sub-resposta</option>
-      ${subOptions}
-    </select>
+    <div class="subrespostas">
+      <label>Sub-respostas (pode marcar mais de uma)</label>
+      ${subHtml}
+    </div>
 
     <label>Observações</label>
     <textarea placeholder="Observações..."></textarea>
@@ -149,19 +192,23 @@ perguntas.forEach((textoPergunta, index) => {
   form.appendChild(div);
 });
 
-function habilitarSubResposta(i) {
-  const sub = document.querySelectorAll(".subresposta")[i];
-  sub.disabled = false;
+// ==========================
+// FUNÇÕES
+// ==========================
+
+function ativarSubrespostas(index) {
+  document.querySelectorAll(`input[name="sub_${index}"]`)
+    .forEach(cb => cb.disabled = false);
 }
 
 function gerarPDF() {
-  const respostas = document.querySelectorAll(".resposta");
-  const subrespostas = document.querySelectorAll(".subresposta");
-  const observacoes = document.querySelectorAll("textarea");
+  const selects = document.querySelectorAll("select");
+  const textareas = document.querySelectorAll("textarea");
 
-  for (let i = 0; i < respostas.length; i++) {
-    if (!respostas[i].value || !subrespostas[i].value) {
-      alert("Por favor, selecione a resposta e a sub-resposta em todas as perguntas.");
+  for (let i = 0; i < selects.length; i++) {
+    const subChecks = document.querySelectorAll(`input[name="sub_${i}"]:checked`);
+    if (!selects[i].value || subChecks.length === 0) {
+      alert("Responda todas as perguntas e selecione ao menos uma sub-resposta.");
       return;
     }
   }
@@ -172,32 +219,20 @@ function gerarPDF() {
 
   perguntas.forEach((p, i) => {
     doc.setFontSize(12);
-    doc.text(`${i + 1}. ${p}`, 10, y);
-    y += 6;
+    doc.text(`${i + 1}. ${p}`, 10, y); y += 6;
 
     doc.setFontSize(10);
-    doc.text(`Resposta: ${respostas[i].value}`, 10, y);
-    y += 6;
+    doc.text(`Resposta: ${selects[i].value}`, 10, y); y += 6;
 
-    doc.text(`Sub-resposta: ${subrespostas[i].value}`, 10, y);
-    y += 6;
+    const subs = [...document.querySelectorAll(`input[name="sub_${i}"]:checked`)]
+      .map(cb => cb.value)
+      .join(", ");
 
-    if (observacoes[i].value) {
-      doc.text(`Observações: ${observacoes[i].value}`, 10, y);
-      y += 6;
+    doc.text(`Sub-respostas: ${subs}`, 10, y); y += 6;
+
+    if (textareas[i].value) {
+      doc.text(`Observações: ${textareas[i].value}`, 10, y); y += 6;
     }
 
     y += 6;
     if (y > 270) {
-      doc.addPage();
-      y = 10;
-    }
-  });
-
-  doc.save("observacao_pedagogica.pdf");
-  document.getElementById("feedback").innerText = "✅ PDF gerado com sucesso!";
-}
-</script>
-
-</body>
-</html>

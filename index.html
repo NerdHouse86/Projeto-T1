@@ -460,23 +460,7 @@ function enviarPorEmail() {
 }
 
 // PDF e Word (mantidos)
-async function gerarPDF() {
-  const overlay = document.getElementById('overlay');
-  overlay.classList.add('ativo');
-  const relatorioHTML = gerarHTMLRelatorio();
-  const tempDiv = document.createElement('div');
-  tempDiv.style.position = 'absolute'; tempDiv.style.left = '-9999px'; tempDiv.style.top = '0';
-  tempDiv.style.background = 'white'; tempDiv.style.width = '210mm';
-  tempDiv.innerHTML = relatorioHTML;
-  document.body.appendChild(tempDiv);
-  const nomeProfessor = (obterCabecalho().professor !== '—' ? obterCabecalho().professor : 'relatorio').replace(/\s+/g, '_');
-  const opt = { margin: [12,12,12,12], filename: `Observacao_${nomeProfessor}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
-  try {
-    await html2pdf().set(opt).from(tempDiv).save();
-    mostrarToast('✅ PDF gerado com sucesso!');
-  } catch (err) { console.error(err); alert('Erro ao gerar PDF'); }
-  finally { document.body.removeChild(tempDiv); overlay.classList.remove('ativo'); }
-}
+
 
 function gerarWord() {
   const cab = obterCabecalho();

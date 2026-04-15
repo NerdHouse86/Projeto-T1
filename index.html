@@ -422,45 +422,84 @@ function obterCabecalho() {
   };
 }
 
-// Gera versão TEXTO PURO do relatório para o corpo do e-mail (evita problemas de formatação)
-function gerarTextoRelatorio() {
-  const cab = obterCabecalho();
-  let corpo = `RELATÓRIO DE OBSERVAÇÃO DE AULA\n\n`;
-  corpo += `Data: ${cab.data}\nEscola: ${cab.escola}\nProfessor(a): ${cab.professor}\nComponente: ${cab.componente}\nTurma: ${cab.turma}\n\n`;
-  corpo += `==========================================\n`;
-  perguntas.forEach((p, i) => {
-    const texto = document.getElementById(`texto-${i}`).value.trim();
-    if (texto) {
-      corpo += `\n▶ ${p.titulo}\n${texto}\n`;
-    }
+// Gera HTML completo do relatório para PDF (clone tratado)
+function gerarCloneRelatorioParaPDF() {
+  // clona o container principal
+  const original = document.getElementById('conteudo');
+  const clone = original.cloneNode(true);
+  // remove todos os elementos .no-print (botões, grupos, textareas, etc)
+  clone.querySelectorAll('.no-print').forEach(el => el.remove());
+  // esconde elementos que podem atrapalhar (mas já foram removidos)
+  // substitui cada .print-text pelo seu conteúdo visível
+  clone.querySelectorAll('.print-text').forEach(el => {
+    // o .print-text contém o texto puro do relatório da seção, mas como o textarea foi removido, garantimos que o conteúdo já está sincronizado
+    // tornamos o print-text visível e com estilo adequado
+    el.style.display = 'block';
+    el.style.marginBottom = '16px';
+    el.style.backgroundColor = '#fafcff';
+    el.style.padding = '12px 16px';
+    el.style.borderRadius = '12px';
+    el.style.border = '1px solid #e2e8f0';
+    el.style.fontSize = '0.85rem';
+    el.style.lineHeight = '1.6';
   });
-  corpo += `\n--- Relatório gerado automaticamente ---\n`;
-  return corpo;
+  // ajusta os inputs do cabeçalho para mostrar apenas os valores (substitui input por texto)
+  clone.querySelectorAll('.header-grid input').forEach(input => {
+    const valor = input.value;
+    const span = document.createElement('span');
+    span.className = 'print-value';
+    span.innerText = valor || '—';
+    span.style.fontWeight = '500';
+    span.style.display = 'inline-block';
+    span.style.padding = '4px 0';
+    input.parentNode.replaceChild(span, input);
+  });
+  // remove qualquer elemento remanescente com classe no-print (caso algum escape)
+  clone.querySelectorAll('.no-print').forEach(el => el.remove());
+  // ajusta margens e estilo para impressão
+  clone.style.padding = '20px';
+  clone.style.maxWidth = '100%';
+  clone.style.backgroundColor = 'white';
+  clone.style.boxShadow = 'none';
+  clone.style.borderRadius = '0';
+  return clone;
 }
 
-// Envio por e-mail via mailto (sem backend)
-function enviarPorEmail() {
-  const cab = obterCabecalho();
-  let destinatario = cab.email;
-  if (!destinatario) {
-    mostrarToast('⚠️ Preencha o campo de e-mail destinatário.');
-    return;
+async function gerarPDF() {
+  const overlay = document.getElementById('overlay');
+  overlay.classList.add('ativo');
+  try {
+    const cloneRelatorio = gerarCloneRelatorioParaPDF();
+    // cria um container temporário visível, mas fora da tela para não atrapalhar
+    const tempDiv = document.createElement('div');
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.top = '-10000px';
+    tempDiv.style.left = '0';
+    tempDiv.style.width = '210mm';
+    tempDiv.style.backgroundColor = 'white';
+    tempDiv.style.zIndex = '-1';
+    tempDiv.appendChild(cloneRelatorio);
+    document.body.appendChild(tempDiv);
+    
+    const cab = obterCabecalho();
+    const nomeProfessor = (cab.professor !== '—' ? cab.professor : 'relatorio').replace(/\s+/g, '_');
+    const opt = {
+      margin: [12, 12, 12, 12],
+      filename: `Observacao_${nomeProfessor}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, letterRendering: true, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    await html2pdf().set(opt).from(tempDiv).save();
+    mostrarToast('✅ PDF gerado com sucesso!');
+    document.body.removeChild(tempDiv);
+  } catch (err) {
+    console.error(err);
+    alert('Erro ao gerar PDF. Verifique o console.');
+  } finally {
+    overlay.classList.remove('ativo');
   }
-  // Validação simples de e-mail
-  if (!destinatario.includes('@') || !destinatario.includes('.')) {
-    mostrarToast('❌ Digite um e-mail válido (exemplo@dominio.com).');
-    return;
-  }
-  const assunto = encodeURIComponent(`Relatório de Observação - ${cab.professor} - ${cab.data}`);
-  const corpoTexto = gerarTextoRelatorio();
-  const corpoEncoded = encodeURIComponent(corpoTexto);
-  const mailtoLink = `mailto:${destinatario}?subject=${assunto}&body=${corpoEncoded}`;
-  window.location.href = mailtoLink;
-  mostrarToast(`📧 Abrindo cliente de e-mail para ${destinatario}. Envie após revisar.`);
 }
-
-// PDF e Word (mantidos)
-
 
 function gerarWord() {
   const cab = obterCabecalho();
@@ -484,6 +523,40 @@ function gerarHTMLRelatorio() {
     corpoHtml += `<div style="margin-top:28px; page-break-inside:avoid;"><h2 style="color:#1e3c72; font-size:1rem; border-left:4px solid #2a5298; padding-left:12px;">${p.titulo}</h2><div style="background:#fafcff; padding:12px 18px; border-radius:12px; border:1px solid #e2e8f0; white-space:pre-line;">${texto.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}</div></div>`;
   });
   return `<div style="font-family:'Segoe UI',Arial,sans-serif; max-width:1000px; margin:0 auto; padding:24px;"><h1 style="text-align:center; color:#1e3c72;">RELATÓRIO DE OBSERVAÇÃO DE AULA</h1><div style="background:#f1f5f9; padding:16px; border-radius:16px; margin:20px 0;"><div><strong>📅 Data:</strong> ${cab.data}</div><div><strong>🏫 Escola:</strong> ${cab.escola}</div><div><strong>👨‍🏫 Professor:</strong> ${cab.professor}</div><div><strong>📚 Componente:</strong> ${cab.componente}</div><div><strong>👥 Turma:</strong> ${cab.turma}</div></div>${corpoHtml || '<p style="text-align:center;">Nenhuma observação registrada.</p>'}</div>`;
+}
+
+function gerarTextoRelatorio() {
+  const cab = obterCabecalho();
+  let corpo = `RELATÓRIO DE OBSERVAÇÃO DE AULA\n\n`;
+  corpo += `Data: ${cab.data}\nEscola: ${cab.escola}\nProfessor(a): ${cab.professor}\nComponente: ${cab.componente}\nTurma: ${cab.turma}\n\n`;
+  corpo += `==========================================\n`;
+  perguntas.forEach((p, i) => {
+    const texto = document.getElementById(`texto-${i}`).value.trim();
+    if (texto) {
+      corpo += `\n▶ ${p.titulo}\n${texto}\n`;
+    }
+  });
+  corpo += `\n--- Relatório gerado automaticamente ---\n`;
+  return corpo;
+}
+
+function enviarPorEmail() {
+  const cab = obterCabecalho();
+  let destinatario = cab.email;
+  if (!destinatario) {
+    mostrarToast('⚠️ Preencha o campo de e-mail destinatário.');
+    return;
+  }
+  if (!destinatario.includes('@') || !destinatario.includes('.')) {
+    mostrarToast('❌ Digite um e-mail válido (exemplo@dominio.com).');
+    return;
+  }
+  const assunto = encodeURIComponent(`Relatório de Observação - ${cab.professor} - ${cab.data}`);
+  const corpoTexto = gerarTextoRelatorio();
+  const corpoEncoded = encodeURIComponent(corpoTexto);
+  const mailtoLink = `mailto:${destinatario}?subject=${assunto}&body=${corpoEncoded}`;
+  window.location.href = mailtoLink;
+  mostrarToast(`📧 Abrindo cliente de e-mail para ${destinatario}. Envie após revisar.`);
 }
 
 function mostrarToast(msg) {

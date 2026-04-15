@@ -5,52 +5,159 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Relatório de Observação de Aula</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
 <style>
-body{ font-family: Arial, sans-serif; background: #eef; margin: 0; padding: 20px; }
-.container{ max-width: 1000px; margin: auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-h1, h2{ color: #2c3e50; border-bottom: 2px solid #34495e; padding-bottom: 5px; margin-top: 30px; }
-.section{ margin-bottom: 35px; padding: 15px; border: 1px solid #eee; border-radius: 8px; page-break-inside: avoid; }
-.header-grid{ display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 20px; background: #f9f9f9; padding: 15px; border-radius: 5px; border: 1px solid #ddd; }
-input, textarea{ width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #bdc3c7; border-radius: 4px; box-sizing: border-box; }
-textarea{ height: 150px; font-family: inherit; font-size: 14px; }
-.btn-status{ background: #f0f4f8; padding: 10px 15px; margin: 5px 2px; display: inline-block; cursor: pointer; border-radius: 5px; border: 1px solid #d1d9e6; font-size: 13px; color: #34495e; vertical-align: top; width: 30%; min-height: 60px; }
-.btn-status.active{ background: #34495e; color: #fff; font-weight: bold; border-color: #2c3e50; }
-.lista-opcoes { margin: 15px 0; display: flex; flex-direction: column; gap: 8px; background: #fff; padding: 10px; border: 1px solid #eee; border-radius: 5px; }
-.opcao{ background: #f8f9fa; padding: 12px; cursor: pointer; border-radius: 4px; border-left: 5px solid #bdc3c7; font-size: 13px; line-height: 1.4; }
-.opcao:hover{ background: #e9ecef; }
-.opcao.selecionado{ background: #d4edda; border-left-color: #28a745; }
-.btn-pdf{ position: fixed; bottom: 20px; right: 20px; padding: 15px 30px; background: #e67e22; color: #fff; border: none; cursor: pointer; border-radius: 50px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000; }
-.print-text { display: none; white-space: pre-wrap; padding: 15px; background: #fdfdfd; border: 1px solid #eee; font-size: 14px; line-height: 1.6; }
+* { box-sizing: border-box; }
 
-@media print{
-  .no-print{ display: none !important; }
-  .container { box-shadow: none; width: 100%; border: none; padding: 0; }
-  textarea { display: none; }
-  .print-text { display: block; }
-  h1 { font-size: 22px; text-align: center; }
-  h2 { font-size: 18px; margin-top: 20px; }
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #eef2f7;
+    margin: 0;
+    padding: 20px 20px 100px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+h1 {
+    color: #1e3c72;
+    border-bottom: 3px solid #2a5298;
+    padding-bottom: 12px;
+    margin-top: 0;
+}
+
+h2 {
+    color: #2c3e50;
+    border-left: 6px solid #2a5298;
+    padding-left: 15px;
+    margin: 30px 0 20px;
+    font-size: 1.4rem;
+}
+
+.header-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+    background: #f8faff;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.header-grid label {
+    font-weight: 600;
+    color: #1e3c72;
+    display: block;
+    margin-bottom: 5px;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #bdd3e8;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+textarea {
+    height: 120px;
+    resize: vertical;
+}
+
+.section {
+    margin-bottom: 35px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fafcff;
+}
+
+.btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.btn-status {
+    background: #f0f4f8;
+    padding: 10px 16px;
+    cursor: pointer;
+    border-radius: 30px;
+    border: 1px solid #cbd5e1;
+    font-size: 13px;
+}
+
+.btn-status.active {
+    background: #1e3c72;
+    color: white;
+}
+
+.lista-opcoes {
+    margin: 15px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: white;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+.opcao {
+    background: #f8fafc;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.opcao.selecionado {
+    background: #d4edda;
+    font-weight: 500;
+}
+
+.acoes-flutuantes {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+}
+
+.btn-word {
+    padding: 16px 30px;
+    border: none;
+    cursor: pointer;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: bold;
+    background: #2b5797;
+    color: white;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
 }
 </style>
 </head>
 <body>
 
-<div class="container" id="conteudo">
-    <h1>Relatório de Observação de Aula</h1>
+<div class="container">
+    <h1>📋 Relatório de Observação de Aula</h1>
 
     <div class="header-grid">
-        <div><label>Data:</label><input type="date" id="data"></div>
-        <div><label>Escola:</label><input id="escola" placeholder="Unidade Escolar"></div>
-        <div><label>Professor:</label><input id="professor" placeholder="Nome do Docente"></div>
-        <div><label>Componente:</label><input id="componente" placeholder="Ex: Língua Portuguesa"></div>
-        <div><label>Turma:</label><input id="turma" placeholder="Turma/Série"></div>
+        <div><label>📅 Data</label><input type="date" id="data"></div>
+        <div><label>🏫 Escola</label><input id="escola"></div>
+        <div><label>👨‍🏫 Professor</label><input id="professor"></div>
+        <div><label>📚 Componente</label><input id="componente"></div>
+        <div><label>👥 Turma</label><input id="turma"></div>
     </div>
 
     <div id="formulario"></div>
 </div>
 
-<button class="btn-pdf no-print" onclick="gerarPDF()">📄 GERAR PDF COMPLETO</button>
+<div class="acoes-flutuantes">
+    <button class="btn-word" onclick="gerarWord()">📥 BAIXAR RELATÓRIO EM WORD</button>
+</div>
 
 <script>
 const perguntas = [
@@ -261,142 +368,78 @@ const perguntas = [
             }
         }
     }
-]
-function gerarFormulario(){
-    const container = document.getElementById('formulario');
-    container.innerHTML = "";
-    perguntas.forEach((p, pIdx) => {
-        const div = document.createElement('div');
-        div.className = 'section';
-        div.innerHTML = `
+];
+
+function gerarFormulario() {
+    const c = document.getElementById('formulario');
+    perguntas.forEach((p, i) => {
+        c.innerHTML += `
+        <div class="section">
             <h2>${p.titulo}</h2>
-            <div class="no-print" style="display:flex; justify-content: space-between;">
-                ${Object.keys(p.banco).map(chave => `
-                    <div class="btn-status" onclick="alternarOpcoes(${pIdx}, '${chave}', this)">
-                        ${p.banco[chave].titulo}
-                    </div>
-                `).join('')}
+            <div class="btn-group">
+                ${Object.keys(p.banco).map(k => `
+                    <div class="btn-status" onclick="mostrar(${i},'${k}',this)">
+                        ${p.banco[k].titulo}
+                    </div>`).join("")}
             </div>
-            <div id="lista-${pIdx}" class="lista-opcoes no-print"></div>
-            <h4>Registro / Evidências:</h4>
-            <textarea id="texto-${pIdx}" oninput="syncText(${pIdx})"></textarea>
-            <div id="print-${pIdx}" class="print-text"></div>
+            <div id="lista-${i}" class="lista-opcoes"></div>
+            <textarea id="texto-${i}" placeholder="Registro..."></textarea>
+        </div>
         `;
-        container.appendChild(div);
     });
 }
 
-function alternarOpcoes(pIdx, chave, botao){
-    const lista = document.getElementById(`lista-${pIdx}`);
-    if(botao.classList.contains('active')){
-        botao.classList.remove('active');
-        lista.innerHTML = "";
-        return;
+function mostrar(i,k,el){
+    document.querySelectorAll('.btn-status').forEach(b=>b.classList.remove('active'));
+    el.classList.add('active');
+    const l = document.getElementById('lista-'+i);
+    l.innerHTML="";
+    perguntas[i].banco[k].frases.forEach(f=>{
+        const d=document.createElement('div');
+        d.className='opcao';
+        d.innerText=f;
+        d.onclick=()=>document.getElementById('texto-'+i).value+=`• ${f}\n`;
+        l.appendChild(d);
+    });
+}
+
+function obterCab(){
+    return {
+        data:data.value,
+        escola:escola.value,
+        professor:professor.value,
+        componente:componente.value,
+        turma:turma.value
     }
-    botao.parentElement.querySelectorAll('.btn-status').forEach(b => b.classList.remove('active'));
-    botao.classList.add('active');
-    lista.innerHTML = "";
-    perguntas[pIdx].banco[chave].frases.forEach(frase => {
-        const item = document.createElement('div');
-        item.className = 'opcao';
-        item.innerText = frase;
-        item.onclick = () => {
-            const campo = document.getElementById(`texto-${pIdx}`);
-            const linha = "• " + frase;
-            if(campo.value.includes(frase)){
-                campo.value = campo.value.split('\n').filter(l => !l.includes(frase)).join('\n');
-                item.classList.remove('selecionado');
-            } else {
-                campo.value += (campo.value ? '\n' : '') + linha;
-                item.classList.add('selecionado');
-            }
-            syncText(pIdx);
-        };
-        lista.appendChild(item);
+}
+
+function gerarHTML(){
+    const c=obterCab();
+    let h=`<h1>RELATÓRIO DE OBSERVAÇÃO</h1>
+    <p><strong>Professor:</strong> ${c.professor}</p>
+    <p><strong>Escola:</strong> ${c.escola}</p>`;
+    perguntas.forEach((p,i)=>{
+        if(texto-i?.value){} // apenas visual
+        const t=document.getElementById('texto-'+i).value;
+        if(t.trim()) h+=`<h2>${p.titulo}</h2><p>${t.replace(/\n/g,'<br>')}</p>`;
     });
+    return h;
 }
 
-function syncText(idx) {
-    document.getElementById(`print-${idx}`).innerText = document.getElementById(`texto-${idx}`).value;
+function gerarWord(){
+    const html=`
+    <!DOCTYPE html><html><head><meta charset="UTF-8"></head>
+    <body style="font-family:Segoe UI">${gerarHTML()}</body></html>`;
+    const blob=new Blob(['\ufeff',html],{type:'application/msword'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='Relatorio_Observacao.doc';
+    a.click();
 }
-
-function gerarPDF(){
-    // Coleta dados do cabeçalho
-    const data = document.getElementById('data').value || '-';
-    const escola = document.getElementById('escola').value || '-';
-    const professor = document.getElementById('professor').value || '-';
-    const componente = document.getElementById('componente').value || '-';
-    const turma = document.getElementById('turma').value || '-';
-
-    // Monta o HTML do relatório
-    let relatorioHTML = `
-        <div style="font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; padding: 20px; background: white; color: black; width: 210mm; box-sizing: border-box;">
-            <h1 style="text-align: center; color: #2c3e50; border-bottom: 2px solid #34495e; padding-bottom: 10px;">RELATÓRIO DE OBSERVAÇÃO DE AULA</h1>
-            <div style="margin: 20px 0; background: #f9f9f9; padding: 15px; border-radius: 5px;">
-                <p><strong>Data:</strong> ${data}</p>
-                <p><strong>Escola:</strong> ${escola}</p>
-                <p><strong>Professor:</strong> ${professor}</p>
-                <p><strong>Componente:</strong> ${componente}</p>
-                <p><strong>Turma:</strong> ${turma}</p>
-            </div>
-    `;
-
-    // Para cada pergunta, adiciona o título e o texto (se houver)
-    perguntas.forEach((p, idx) => {
-        const texto = document.getElementById(`texto-${idx}`).value;
-        if (texto.trim() !== '') {
-            relatorioHTML += `
-                <div style="margin-top: 25px;">
-                    <h2 style="color: #2c3e50; font-size: 16px; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px;">${p.titulo}</h2>
-                    <p style="text-align: justify; white-space: pre-line;">${texto.replace(/\n/g, '<br>')}</p>
-                </div>
-            `;
-        }
-    });
-
-    relatorioHTML += `</div>`;
-
-    // Cria um elemento temporário e adiciona ao body (fora da tela, mas visível para renderização)
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = relatorioHTML;
-    tempDiv.style.position = 'absolute';
-    tempDiv.style.left = '-9999px';
-    tempDiv.style.top = '0';
-    tempDiv.style.width = '210mm';
-    tempDiv.style.backgroundColor = 'white';
-    document.body.appendChild(tempDiv);
-
-    // Configurações do PDF
-    const opt = {
-        margin: [10, 10, 10, 10],
-        filename: `Relatorio_${professor.replace(/\s+/g, '_') || 'Docente'}.pdf`,
-        image: { type: 'jpeg', quality: 0.95 },
-        html2canvas: { scale: 2, letterRendering: true, useCORS: true },
-        jsPDF: { 
-            unit: 'mm', 
-            format: 'a4', 
-            orientation: 'portrait' 
-        },
-        pagebreak: { mode: ['css', 'legacy'] }
-    };
-
-    // Pequeno timeout para garantir que o navegador renderizou o elemento
-    setTimeout(() => {
-        html2pdf().set(opt).from(tempDiv).save().then(() => {
-            // Remove o elemento temporário após a geração
-            document.body.removeChild(tempDiv);
-        }).catch(err => {
-            console.error('Erro ao gerar PDF:', err);
-            document.body.removeChild(tempDiv);
-            alert('Ocorreu um erro ao gerar o PDF. Verifique o console.');
-        });
-    }, 100);
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById('data').valueAsDate = new Date();
-    gerarFormulario();
-});
+document.getElementById('data').valueAsDate = new Date();
+gerarFormulario();
 </script>
+
 </body>
 </html>
+``

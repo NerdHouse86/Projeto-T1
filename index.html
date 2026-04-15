@@ -330,7 +330,7 @@ function gerarPDF(){
 
     // Monta o HTML do relatório
     let relatorioHTML = `
-        <div style="font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; padding: 20px;">
+        <div style="font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; padding: 20px; background: white; color: black; width: 210mm; box-sizing: border-box;">
             <h1 style="text-align: center; color: #2c3e50; border-bottom: 2px solid #34495e; padding-bottom: 10px;">RELATÓRIO DE OBSERVAÇÃO DE AULA</h1>
             <div style="margin: 20px 0; background: #f9f9f9; padding: 15px; border-radius: 5px;">
                 <p><strong>Data:</strong> ${data}</p>
@@ -356,16 +356,22 @@ function gerarPDF(){
 
     relatorioHTML += `</div>`;
 
-    // Cria um elemento temporário para renderizar o PDF
+    // Cria um elemento temporário e adiciona ao body (fora da tela, mas visível para renderização)
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = relatorioHTML;
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+    tempDiv.style.top = '0';
+    tempDiv.style.width = '210mm';
+    tempDiv.style.backgroundColor = 'white';
+    document.body.appendChild(tempDiv);
 
     // Configurações do PDF
     const opt = {
         margin: [10, 10, 10, 10],
         filename: `Relatorio_${professor.replace(/\s+/g, '_') || 'Docente'}.pdf`,
         image: { type: 'jpeg', quality: 0.95 },
-        html2canvas: { scale: 2, letterRendering: true },
+        html2canvas: { scale: 2, letterRendering: true, useCORS: true },
         jsPDF: { 
             unit: 'mm', 
             format: 'a4', 
@@ -374,8 +380,17 @@ function gerarPDF(){
         pagebreak: { mode: ['css', 'legacy'] }
     };
 
-    // Gera o PDF diretamente
-    html2pdf().set(opt).from(tempDiv).save();
+    // Pequeno timeout para garantir que o navegador renderizou o elemento
+    setTimeout(() => {
+        html2pdf().set(opt).from(tempDiv).save().then(() => {
+            // Remove o elemento temporário após a geração
+            document.body.removeChild(tempDiv);
+        }).catch(err => {
+            console.error('Erro ao gerar PDF:', err);
+            document.body.removeChild(tempDiv);
+            alert('Ocorreu um erro ao gerar o PDF. Verifique o console.');
+        });
+    }, 100);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
